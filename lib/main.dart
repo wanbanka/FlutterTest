@@ -18,13 +18,45 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.white,
           accentColor: Colors.green,
         ),
-        home: RandomWords());
+        home: ButtonAnimation());
+  }
+}
+
+class ButtonAnimation extends StatefulWidget {
+  @override
+  _ButtonAnimationState createState() => _ButtonAnimationState();
+}
+
+class _ButtonAnimationState extends State<ButtonAnimation> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Test")),
+      body: Center(
+        child: Container(
+          width: 320.0,
+          height: 60.0,
+          alignment: FractionalOffset.center,
+          decoration: new BoxDecoration(
+              color: const Color.fromRGBO(247, 64, 106, 1.0),
+              borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
+          child: new Text(
+            "Sign in",
+            style: new TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 0.3),
+          ),
+        ),
+      ),
+    );
   }
 }
 
 //RandomWords' controller
 
-class RandomWords extends StatefulWidget {
+/*class RandomWords extends StatefulWidget {
   @override
   _RandomWordsState createState() => _RandomWordsState();
 }
@@ -138,4 +170,4 @@ class _RandomWordsState extends State<RandomWords> {
       );
     }));
   }
-}
+}*/
