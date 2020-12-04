@@ -27,30 +27,67 @@ class ButtonAnimation extends StatefulWidget {
   _ButtonAnimationState createState() => _ButtonAnimationState();
 }
 
-class _ButtonAnimationState extends State<ButtonAnimation> {
+class _ButtonAnimationState extends State<ButtonAnimation>
+    with TickerProviderStateMixin, SingleTickerProviderStateMixin {
   @override
+  AnimationController loginButtonController;
+
+  void initState() {
+    super.initState();
+
+    loginButtonController = new AnimationController(
+        duration: new Duration(milliseconds: 3000), vsync: this);
+  }
+
+  Future<Null> _playAnimation() async {
+    try {
+      await loginButtonController.forward();
+      await loginButtonController.reverse();
+    } on TickerCanceled {}
+  }
+
   Widget build(BuildContext context) {
+    var buttonSqueezeAnimation = new Tween(begin: 320.0, end: 70.0);
+
     return Scaffold(
-      appBar: AppBar(title: Text("Test")),
-      body: Center(
-        child: Container(
-          width: 320.0,
-          height: 60.0,
-          alignment: FractionalOffset.center,
-          decoration: new BoxDecoration(
+        appBar: AppBar(title: Text("Test")),
+        body: Center(
+          child: Container(
+            alignment: FractionalOffset.center,
+            child: new FlatButton(
+              height: 60.0,
+              minWidth: buttonSqueezeAnimation
+                  .animate(new CurvedAnimation(
+                      curve: new Interval(0.0, 0.250),
+                      parent: loginButtonController))
+                  .value,
               color: const Color.fromRGBO(247, 64, 106, 1.0),
-              borderRadius: new BorderRadius.all(const Radius.circular(30.0))),
-          child: new Text(
-            "Sign in",
-            style: new TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
-                fontWeight: FontWeight.w300,
-                letterSpacing: 0.3),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0)),
+              child: buttonSqueezeAnimation
+                          .animate(new CurvedAnimation(
+                              curve: new Interval(0.0, 0.250),
+                              parent: loginButtonController))
+                          .value >
+                      75.0
+                  ? new Text(
+                      "Sign in",
+                      style: new TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w300,
+                          letterSpacing: 0.3),
+                    )
+                  : new CircularProgressIndicator(
+                      valueColor:
+                          new AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+              onPressed: () {
+                _playAnimation();
+              },
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
