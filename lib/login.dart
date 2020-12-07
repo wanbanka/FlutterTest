@@ -12,25 +12,28 @@ class _LoginFormState extends State<LoginForm> {
 
   final myController = TextEditingController();
 
-  void printLastValue() {
-    print('Second text field: ${myController.text}');
-  }
+  final controller2 = TextEditingController();
+
+  FocusNode myFocusNode;
 
   @override
   void initState() {
     super.initState();
-
-    myController.addListener(printLastValue);
+    myFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
     myController.dispose();
+    controller2.dispose();
+    myFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    BuildContext globalContext = context;
+
     return Scaffold(
       body: Builder(
         builder: (context) => Center(
@@ -39,32 +42,62 @@ class _LoginFormState extends State<LoginForm> {
             child: Column(
               children: <Widget>[
                 TextFormField(
-                  onChanged: (text) {
-                    print(text);
-                  },
+                  focusNode: myFocusNode,
+                  controller: myController,
                   decoration: InputDecoration(
-                      border: InputBorder.none, labelText: "Enter a username"),
+                      border: InputBorder.none, labelText: "Username"),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Entrez du texte';
+                      return 'Champ vide';
                     }
 
                     return null;
                   },
                 ),
                 TextFormField(
-                  controller: myController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Champ vide';
+                    }
+
+                    return null;
+                  },
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  obscureText: true,
+                  controller: controller2,
                   decoration: InputDecoration(
                       border: InputBorder.none, labelText: "Password"),
                 ),
                 ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState.validate()) {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text('It works !')));
+                        Navigator.pushReplacementNamed(globalContext, "/home");
                       }
                     },
-                    child: Text('Se connecter'))
+                    child: Text('Se connecter')),
+                FloatingActionButton(
+                  onPressed: () {
+                    return showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: Text("User: " +
+                                myController.text +
+                                "\n Password: " +
+                                controller2.text),
+                          );
+                        });
+                  },
+                  tooltip: "Show me the value",
+                  child: Icon(Icons.text_fields),
+                ),
+                FloatingActionButton(
+                  child: Icon(Icons.edit),
+                  onPressed: () {
+                    myFocusNode.requestFocus();
+                  },
+                )
               ],
             ),
           ),
