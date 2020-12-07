@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/animation.dart';
 import 'package:english_words/english_words.dart';
 
 //Start the app
@@ -28,15 +29,30 @@ class ButtonAnimation extends StatefulWidget {
 }
 
 class _ButtonAnimationState extends State<ButtonAnimation>
-    with TickerProviderStateMixin, SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   @override
   AnimationController loginButtonController;
+  var buttonSqueezeAnimation;
+  var buttonZoomOut;
 
+  @override
   void initState() {
     super.initState();
 
     loginButtonController = new AnimationController(
         duration: new Duration(milliseconds: 3000), vsync: this);
+
+    buttonSqueezeAnimation = new Tween(begin: 320.0, end: 70.0).animate(
+        new CurvedAnimation(
+            curve: new Interval(0.0, 0.250), parent: loginButtonController))
+      ..addStatusListener((status) {
+        print(status);
+      });
+
+    buttonZoomOut = new Tween(begin: 70.0, end: 1000.0).animate(
+        new CurvedAnimation(
+            parent: loginButtonController,
+            curve: new Interval(0.550, 0.900, curve: Curves.bounceOut)));
   }
 
   Future<Null> _playAnimation() async {
@@ -47,47 +63,54 @@ class _ButtonAnimationState extends State<ButtonAnimation>
   }
 
   Widget build(BuildContext context) {
-    var buttonSqueezeAnimation = new Tween(begin: 320.0, end: 70.0);
-
     return Scaffold(
         appBar: AppBar(title: Text("Test")),
-        body: Center(
-          child: Container(
-            alignment: FractionalOffset.center,
-            child: new FlatButton(
-              height: 60.0,
-              minWidth: buttonSqueezeAnimation
-                  .animate(new CurvedAnimation(
-                      curve: new Interval(0.0, 0.250),
-                      parent: loginButtonController))
-                  .value,
-              color: const Color.fromRGBO(247, 64, 106, 1.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
-              child: buttonSqueezeAnimation
-                          .animate(new CurvedAnimation(
-                              curve: new Interval(0.0, 0.250),
-                              parent: loginButtonController))
-                          .value >
-                      75.0
-                  ? new Text(
-                      "Sign in",
-                      style: new TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w300,
-                          letterSpacing: 0.3),
-                    )
-                  : new CircularProgressIndicator(
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-              onPressed: () {
-                _playAnimation();
-              },
+        body: Padding(
+          padding: buttonZoomOut.value == 70
+              ? const EdgeInsets.only(bottom: 50.0)
+              : const EdgeInsets.only(top: 0.0, bottom: 0.0),
+          child: InkWell(
+            onTap: () {
+              _playAnimation().then((value) => print('OK !'));
+            },
+            child: Hero(
+              tag: "fade",
+              child: Container(
+                alignment: FractionalOffset.center,
+                width: buttonZoomOut.value == 70
+                    ? buttonSqueezeAnimation.value
+                    : buttonZoomOut.value,
+                height: buttonZoomOut.value == 70 ? 60.0 : buttonZoomOut.value,
+                decoration: new BoxDecoration(
+                    color: const Color.fromRGBO(247, 64, 106, 1.0),
+                    borderRadius: buttonZoomOut.value < 400
+                        ? new BorderRadius.all(const Radius.circular(30.0))
+                        : new BorderRadius.all(const Radius.circular(0.0))),
+                child: buttonSqueezeAnimation.value > 75.0
+                    ? new Text(
+                        "Sign in",
+                        style: new TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 0.3),
+                      )
+                    : buttonZoomOut.value < 300
+                        ? new CircularProgressIndicator(
+                            valueColor:
+                                new AlwaysStoppedAnimation<Color>(Colors.white),
+                          )
+                        : null,
+              ),
             ),
           ),
         ));
+  }
+
+  @override
+  void dispose() {
+    loginButtonController.dispose();
+    super.dispose();
   }
 }
 
