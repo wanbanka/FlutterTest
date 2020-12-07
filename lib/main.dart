@@ -30,7 +30,6 @@ class ButtonAnimation extends StatefulWidget {
 
 class _ButtonAnimationState extends State<ButtonAnimation>
     with SingleTickerProviderStateMixin {
-  @override
   AnimationController loginButtonController;
   var buttonSqueezeAnimation;
   var buttonZoomOut;
@@ -55,6 +54,12 @@ class _ButtonAnimationState extends State<ButtonAnimation>
             curve: new Interval(0.550, 0.900, curve: Curves.bounceOut)));
   }
 
+  @override
+  void dispose() {
+    loginButtonController.dispose();
+    super.dispose();
+  }
+
   Future<Null> _playAnimation() async {
     try {
       await loginButtonController.forward();
@@ -62,6 +67,7 @@ class _ButtonAnimationState extends State<ButtonAnimation>
     } on TickerCanceled {}
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Test")),
@@ -105,12 +111,6 @@ class _ButtonAnimationState extends State<ButtonAnimation>
             ),
           ),
         ));
-  }
-
-  @override
-  void dispose() {
-    loginButtonController.dispose();
-    super.dispose();
   }
 }
 
