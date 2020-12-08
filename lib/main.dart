@@ -5,8 +5,6 @@ import 'home.dart';
 //Start the app
 void main() => runApp(MyApp());
 
-//Start class, launching RandomsWords' controller
-
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
 
