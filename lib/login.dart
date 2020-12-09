@@ -40,8 +40,8 @@ class _LoginFormState extends State<LoginForm> {
                 image: DecorationImage(
                     image: AssetImage('assets/background_login.jpg'),
                     fit: BoxFit.cover,
-                    colorFilter:
-                        ColorFilter.mode(Color(0x88aaaaaa), BlendMode.darken))),
+                    colorFilter: ColorFilter.mode(
+                        Color(0x88aaaaaa), BlendMode.exclusion))),
             child: Form(
               key: formKey,
               child: Column(
