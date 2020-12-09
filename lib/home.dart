@@ -73,6 +73,8 @@ class _HomePageState extends State<HomePage> {
               ),
               Card(
                 color: Color(0xddffffff),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40.0)),
                 child: Column(
                   children: <Widget>[
                     ListTile(
@@ -223,7 +225,9 @@ class _HomePageState extends State<HomePage> {
                           label: Text(""),
                         )
                       ],
-                    )
+                    ),
+                    Image.network(
+                        "https://www.corunning.fr/avatar/5f612883e75c1d10ec38f9d6_activite.jpg")
                   ],
                 ),
               ),

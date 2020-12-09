@@ -8,17 +8,35 @@ class LoginForm extends StatefulWidget {
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> {
+class _LoginFormState extends State<LoginForm>
+    with SingleTickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
 
   final myController = TextEditingController();
 
   final controller2 = TextEditingController();
 
+  AnimationController buttonController;
+
+  var buttonZoomOut;
+
+  @override
+  void initState() {
+    super.initState();
+    buttonController = new AnimationController(
+        duration: Duration(milliseconds: 3000), vsync: this);
+
+    buttonZoomOut = new Tween(begin: 70.0, end: 1000.0).animate(
+        new CurvedAnimation(
+            parent: buttonController,
+            curve: new Interval(0.0, 0.550, curve: Curves.bounceOut)));
+  }
+
   @override
   void dispose() {
     myController.dispose();
     controller2.dispose();
+    buttonController.dispose();
     super.dispose();
   }
 
@@ -89,24 +107,45 @@ class _LoginFormState extends State<LoginForm> {
                     child: TextButton(
                         onPressed: () {
                           if (formKey.currentState.validate()) {
-                            Navigator.pushReplacementNamed(
-                                globalContext, "/home");
+                            buttonController.forward();
+
+                            if (buttonController.isCompleted) {
+                              Navigator.pushReplacementNamed(
+                                  globalContext, "/home");
+                            }
                           }
                         },
-                        child: Text('Se connecter'),
+                        child: buttonZoomOut.value < 90.0
+                            ? Text('Se connecter')
+                            : buttonZoomOut.value < 300.0
+                                ? new CircularProgressIndicator(
+                                    value: null,
+                                    strokeWidth: 1.0,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                            Colors.white),
+                                  )
+                                : null,
                         style: ButtonStyle(
+                            animationDuration: Duration(milliseconds: 3000),
                             backgroundColor: MaterialStateProperty.all<Color>(
                                 const Color(0xff98c045)),
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                                const EdgeInsets.only(
-                                    left: 48, right: 48, top: 16, bottom: 16)),
+                            padding: buttonZoomOut.value < 300.0
+                                ? MaterialStateProperty.all<EdgeInsets>(
+                                    const EdgeInsets.only(
+                                        left: 48,
+                                        right: 48,
+                                        top: 16,
+                                        bottom: 16))
+                                : MaterialStateProperty.all<EdgeInsets>(
+                                    const EdgeInsets.all(1000.0)),
                             foregroundColor: MaterialStateProperty.all<Color>(
                                 const Color(0xffffffff)),
                             shape: MaterialStateProperty.all<OutlinedBorder>(
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30.0))),
-                            textStyle: MaterialStateProperty.all<TextStyle>(
-                                TextStyle(fontSize: 20.0)))),
+                            textStyle:
+                                MaterialStateProperty.all<TextStyle>(TextStyle(fontSize: 20.0)))),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
