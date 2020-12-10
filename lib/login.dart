@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/animation.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 
 class LoginForm extends StatefulWidget {
@@ -8,8 +11,7 @@ class LoginForm extends StatefulWidget {
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm>
-    with SingleTickerProviderStateMixin {
+class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
 
   final myController = TextEditingController();
@@ -20,6 +22,10 @@ class _LoginFormState extends State<LoginForm>
 
   var buttonZoomOut;
 
+  double paddingTop;
+
+  double paddingLeft;
+
   @override
   void initState() {
     super.initState();
@@ -27,9 +33,9 @@ class _LoginFormState extends State<LoginForm>
         duration: Duration(milliseconds: 3000), vsync: this);
 
     buttonZoomOut = new Tween(begin: 70.0, end: 1000.0).animate(
-        new CurvedAnimation(
-            parent: buttonController,
-            curve: new Interval(0.0, 0.550, curve: Curves.bounceOut)));
+        new CurvedAnimation(parent: buttonController, curve: Curves.bounceOut));
+
+    this.initAnimations();
   }
 
   @override
@@ -38,6 +44,18 @@ class _LoginFormState extends State<LoginForm>
     controller2.dispose();
     buttonController.dispose();
     super.dispose();
+  }
+
+  void executeAnimation({animation: AnimationController, interval: Double}) {
+    Future.delayed(Duration(milliseconds: interval), () {
+      if (animation != null) {
+        animation.forward();
+      }
+    });
+  }
+
+  void initAnimations() async {
+    this.executeAnimation(animation: buttonController, interval: 300);
   }
 
   @override
@@ -107,17 +125,15 @@ class _LoginFormState extends State<LoginForm>
                     child: TextButton(
                         onPressed: () {
                           if (formKey.currentState.validate()) {
-                            buttonController.forward();
-
                             if (buttonController.isCompleted) {
                               Navigator.pushReplacementNamed(
                                   globalContext, "/home");
                             }
                           }
                         },
-                        child: buttonZoomOut.value < 90.0
+                        child: buttonZoomOut.value < 100.0
                             ? Text('Se connecter')
-                            : buttonZoomOut.value < 300.0
+                            : buttonZoomOut.value < 500.0
                                 ? new CircularProgressIndicator(
                                     value: null,
                                     strokeWidth: 1.0,
@@ -132,11 +148,11 @@ class _LoginFormState extends State<LoginForm>
                                 const Color(0xff98c045)),
                             padding: buttonZoomOut.value < 300.0
                                 ? MaterialStateProperty.all<EdgeInsets>(
-                                    const EdgeInsets.only(
-                                        left: 48,
-                                        right: 48,
-                                        top: 16,
-                                        bottom: 16))
+                                    EdgeInsets.only(
+                                        left: buttonZoomOut.value - 22,
+                                        right: buttonZoomOut.value - 22,
+                                        top: buttonZoomOut.value - 54,
+                                        bottom: buttonZoomOut.value - 54))
                                 : MaterialStateProperty.all<EdgeInsets>(
                                     const EdgeInsets.all(1000.0)),
                             foregroundColor: MaterialStateProperty.all<Color>(

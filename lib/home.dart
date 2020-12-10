@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Components/CardActivity.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -8,6 +9,44 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final List<dynamic> objetTest = [
+    {
+      "date": new DateTime(2021, 06, 27, 3),
+      "lieu": "HUELGOAT - 29690",
+      "type": "Trail",
+      "distance": 80,
+      "vitesse": 5.3,
+      "parcours": "Chemin",
+      "groupe": "UTMA 2021",
+      "participants": 2,
+      "organisateur": "Benjamin",
+      "coactivites": 0,
+      "recommandations": 0,
+      "description": "Prévoir 15 heures.",
+      "tags": [],
+      "image":
+          "https://www.corunning.fr//avatar/5f612883e75c1d10ec38f9d6_activite.jpg",
+      "inscrit": false
+    }
+  ];
+
+  Widget listCards() {
+    for (int index = 0; index < objetTest.length; index++) {
+      return CardActivity(
+          date: objetTest[index]['date'],
+          lieu: objetTest[index]['lieu'],
+          type: objetTest[index]['type'],
+          distance: objetTest[index]['distance'],
+          vitesse: objetTest[index]['vitesse'],
+          parcours: objetTest[index]['parcours'],
+          participants: objetTest[index]['participants'],
+          organisateur: objetTest[index]['organisateur'],
+          description: objetTest[index]['description'],
+          image: objetTest[index]['image'],
+          inscrit: objetTest[index]['inscrit']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,169 +107,10 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(color: const Color(0xffffffff)),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-              Card(
-                color: Color(0xddffffff),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40.0)),
-                child: Column(
-                  children: <Widget>[
-                    ListTile(
-                      leading: Icon(
-                        Icons.calendar_today_outlined,
-                        color: Color(0xfffb3c00),
-                      ),
-                      title: Text("Dimanche 27 juin 2021, 03:00"),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.location_on,
-                        color: Color(0xfffb3c00),
-                      ),
-                      title: Text(
-                        "HUELGOAT - 29690",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    RichText(
-                      text: TextSpan(children: [
-                        WidgetSpan(
-                            child:
-                                Icon(Icons.nature, color: Color(0xfffb3c00))),
-                        TextSpan(
-                            text: "Trail - 80 km",
-                            style: TextStyle(color: Colors.black)),
-                        WidgetSpan(
-                            child: Icon(Icons.speed_outlined,
-                                color: Color(0xfffb3c00))),
-                        TextSpan(
-                            text: "5.3 km/h",
-                            style: TextStyle(color: Colors.black)),
-                        WidgetSpan(
-                            child: Icon(Icons.directions,
-                                color: Color(0xfffb3c00))),
-                        TextSpan(
-                            text: "Parcours chemin",
-                            style: TextStyle(color: Colors.black)),
-                      ]),
-                    ),
-                    RichText(
-                      text: TextSpan(children: [
-                        WidgetSpan(
-                            child: Icon(Icons.people_alt,
-                                color: Color(0xfffb3c00))),
-                        TextSpan(
-                            text: "Activité liée au groupe UTMA 2021",
-                            style: TextStyle(color: Colors.black))
-                      ]),
-                    ),
-                    RichText(
-                      text: TextSpan(children: [
-                        TextSpan(
-                            text:
-                                "2 participant(s) dont 2 homme(s) et 0 femme(s)",
-                            style: TextStyle(color: Colors.black)),
-                      ]),
-                    ),
-                    RichText(
-                      text: TextSpan(children: [
-                        TextSpan(
-                            text: "Proposée par B. (",
-                            style: TextStyle(color: Colors.black)),
-                        TextSpan(
-                            text: "0",
-                            style:
-                                TextStyle(backgroundColor: Color(0xff17a2b8))),
-                        TextSpan(
-                            text: "0",
-                            style: TextStyle(
-                                backgroundColor: Color(0xffffc107),
-                                color: Colors.black)),
-                        TextSpan(
-                            text: ")", style: TextStyle(color: Colors.black)),
-                      ]),
-                    ),
-                    ListTile(
-                      title: Text("Prévoir 15 heures."),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(
-                          child: Text("Ultra-trail",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold)),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xff28a745)),
-                              shape: MaterialStateProperty.all<OutlinedBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(30.0)))),
-                        ),
-                        TextButton(
-                          child: Text("Nature",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold)),
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xff28a745)),
-                              shape: MaterialStateProperty.all<OutlinedBorder>(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(30.0)))),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        RaisedButton.icon(
-                            onPressed: () {},
-                            icon: Icon(Icons.forum, color: Color(0xfffb3c00)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40.0)),
-                            color: Colors.white,
-                            label: Text("0")),
-                        RaisedButton.icon(
-                            onPressed: () {},
-                            icon: Icon(Icons.messenger_outline,
-                                color: Color(0xfffb3c00)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40.0)),
-                            color: Colors.white,
-                            label: Text("ENVOYER UNE QUESTION")),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        RaisedButton.icon(
-                            onPressed: () {},
-                            icon: Icon(Icons.add_box, color: Color(0xfffb3c00)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40.0)),
-                            color: Colors.white,
-                            label: Text("S'INSCRIRE")),
-                        RaisedButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.share, color: Color(0xfffb3c00)),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40.0)),
-                          color: Colors.white,
-                          label: Text(""),
-                        )
-                      ],
-                    ),
-                    Image.network(
-                        "https://www.corunning.fr/avatar/5f612883e75c1d10ec38f9d6_activite.jpg")
-                  ],
-                ),
-              ),
+              listCards()
             ],
           ),
         ),
