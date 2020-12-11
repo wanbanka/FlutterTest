@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'login.dart';
 import 'home.dart';
 
@@ -13,6 +14,8 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: "Form Test",
       home: new LoginForm(),
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: [const Locale("fr"), const Locale("en")],
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/login':

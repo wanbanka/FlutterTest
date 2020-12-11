@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:date_format/date_format.dart';
+import 'CardComponents/RecommendBadge.dart';
+import 'CardComponents/TagBadge.dart';
+import 'Utilities/Colors.dart';
 
 class CardActivity extends StatefulWidget {
   final DateTime date;
@@ -27,10 +31,10 @@ class CardActivity extends StatefulWidget {
       this.groupe,
       @required this.participants,
       @required this.organisateur,
-      this.coactivites,
-      this.recommandations,
+      @required this.coactivites,
+      @required this.recommandations,
       @required this.description,
-      this.tags,
+      @required this.tags,
       @required this.image,
       @required this.inscrit,
       Key key})
@@ -41,9 +45,15 @@ class CardActivity extends StatefulWidget {
 }
 
 class _CardActivityState extends State<CardActivity> {
-  final Color colorRed = Color(0xfffb3c00);
-  final Color colorBlack = Colors.black;
-  final Color colorWhite = Colors.white;
+  List<Widget> buildTags() {
+    List<Widget> tagBadges = [];
+
+    widget.tags.forEach((tag) {
+      tagBadges = [...tagBadges, TagBadge(nom: tag)];
+    });
+
+    return tagBadges;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +67,22 @@ class _CardActivityState extends State<CardActivity> {
                 Icons.calendar_today_outlined,
                 color: colorRed,
               ),
-              title: Text(
-                  "Le ${widget.date.day}/${widget.date.month}/${widget.date.year}, à ${widget.date.hour}:${widget.date.minute}"),
+              title: Text("${formatDate(widget.date, [
+                "Le ",
+                DD,
+                " ",
+                dd,
+                " ",
+                MM,
+                " ",
+                yyyy,
+                ", à ",
+                HH,
+                ":",
+                nn
+              ])}"),
               trailing: Icon(
-                Icons.directions_run,
+                Icons.directions_walk,
                 color: colorBlack,
                 size: 35.0,
               )),
@@ -107,56 +129,16 @@ class _CardActivityState extends State<CardActivity> {
                   style: TextStyle(color: colorBlack)),
             ]),
           ),
-          RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                  text:
-                      "Proposée par ${widget.organisateur.substring(0, 1)}. (",
-                  style: TextStyle(color: colorBlack)),
-              TextSpan(
-                  text: "0",
-                  style: TextStyle(backgroundColor: Color(0xff17a2b8))),
-              TextSpan(
-                  text: "0",
-                  style: TextStyle(
-                      backgroundColor: Color(0xffffc107), color: colorBlack)),
-              TextSpan(text: ")", style: TextStyle(color: colorBlack)),
-            ]),
-          ),
+          RecommendBadge(
+              organisateur: widget.organisateur,
+              coactivites: widget.coactivites,
+              recommandations: widget.recommandations),
           ListTile(
             title: Text("${widget.description}"),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton(
-                child: Text("Ultra-trail",
-                    style: TextStyle(
-                        color: colorWhite,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold)),
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xff28a745)),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)))),
-              ),
-              TextButton(
-                child: Text("Nature",
-                    style: TextStyle(
-                        color: colorWhite,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold)),
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xff28a745)),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0)))),
-              )
-            ],
-          ),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: buildTags()),
           Row(
             children: [
               RaisedButton.icon(
@@ -175,7 +157,7 @@ class _CardActivityState extends State<CardActivity> {
                   label: Text("ENVOYER UNE QUESTION")),
             ],
           ),
-          widget.inscrit
+          !widget.inscrit
               ? Row(
                   children: [
                     RaisedButton.icon(

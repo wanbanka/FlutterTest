@@ -28,14 +28,23 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    super.initState();
     buttonController = new AnimationController(
-        duration: Duration(milliseconds: 3000), vsync: this);
+        duration: Duration(milliseconds: 1000), vsync: this)
+      ..addListener(() {
+        setState(() {});
+
+        if (buttonController.isCompleted) {
+          Navigator.pushReplacementNamed(context, "/home");
+        }
+      });
 
     buttonZoomOut = new Tween(begin: 70.0, end: 1000.0).animate(
-        new CurvedAnimation(parent: buttonController, curve: Curves.bounceOut));
+        new CurvedAnimation(parent: buttonController, curve: Curves.bounceOut))
+      ..addStatusListener((status) {
+        print(status);
+      });
 
-    this.initAnimations();
+    super.initState();
   }
 
   @override
@@ -44,18 +53,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     controller2.dispose();
     buttonController.dispose();
     super.dispose();
-  }
-
-  void executeAnimation({animation: AnimationController, interval: Double}) {
-    Future.delayed(Duration(milliseconds: interval), () {
-      if (animation != null) {
-        animation.forward();
-      }
-    });
-  }
-
-  void initAnimations() async {
-    this.executeAnimation(animation: buttonController, interval: 300);
   }
 
   @override
@@ -122,46 +119,49 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 32.0, 8.0, 8.0),
-                    child: TextButton(
-                        onPressed: () {
-                          if (formKey.currentState.validate()) {
-                            if (buttonController.isCompleted) {
-                              Navigator.pushReplacementNamed(
-                                  globalContext, "/home");
-                            }
-                          }
-                        },
-                        child: buttonZoomOut.value < 100.0
-                            ? Text('Se connecter')
-                            : buttonZoomOut.value < 500.0
-                                ? new CircularProgressIndicator(
-                                    value: null,
-                                    strokeWidth: 1.0,
-                                    valueColor:
-                                        new AlwaysStoppedAnimation<Color>(
-                                            Colors.white),
-                                  )
-                                : null,
-                        style: ButtonStyle(
-                            animationDuration: Duration(milliseconds: 3000),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                const Color(0xff98c045)),
-                            padding: buttonZoomOut.value < 300.0
-                                ? MaterialStateProperty.all<EdgeInsets>(
-                                    EdgeInsets.only(
-                                        left: buttonZoomOut.value - 22,
-                                        right: buttonZoomOut.value - 22,
-                                        top: buttonZoomOut.value - 54,
-                                        bottom: buttonZoomOut.value - 54))
-                                : MaterialStateProperty.all<EdgeInsets>(
-                                    const EdgeInsets.all(1000.0)),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                                const Color(0xffffffff)),
-                            shape: MaterialStateProperty.all<OutlinedBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0))),
-                            textStyle:
-                                MaterialStateProperty.all<TextStyle>(TextStyle(fontSize: 20.0)))),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (formKey.currentState.validate()) {
+                          buttonController.forward();
+                        }
+                      },
+                      child: Transform.scale(
+                        scale: 1 + buttonController.value,
+                        // ignore: missing_required_param
+                        child: TextButton(
+                            child: buttonZoomOut.value < 100.0
+                                ? Text('Se connecter')
+                                : buttonZoomOut.value < 500.0
+                                    ? new CircularProgressIndicator(
+                                        value: null,
+                                        strokeWidth: 1.0,
+                                        valueColor:
+                                            new AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
+                                      )
+                                    : null,
+                            style: ButtonStyle(
+                                animationDuration: Duration(milliseconds: 3000),
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    const Color(0xff98c045)),
+                                padding: buttonZoomOut.value < 100.0
+                                    ? MaterialStateProperty.all<EdgeInsets>(
+                                        EdgeInsets.only(
+                                            left: 48,
+                                            right: 48,
+                                            top: 16,
+                                            bottom: 16))
+                                    : MaterialStateProperty.all<EdgeInsets>(
+                                        EdgeInsets.all(buttonZoomOut.value)),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        const Color(0xffffffff)),
+                                shape: MaterialStateProperty.all<OutlinedBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30.0))),
+                                textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(fontSize: 20.0)))),
+                      ),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 12),

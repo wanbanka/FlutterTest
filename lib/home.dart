@@ -23,10 +23,10 @@ class _HomePageState extends State<HomePage> {
       "coactivites": 0,
       "recommandations": 0,
       "description": "Prévoir 15 heures.",
-      "tags": [],
+      "tags": ["Ultra-Trail", "Nature"],
       "image":
           "https://www.corunning.fr//avatar/5f612883e75c1d10ec38f9d6_activite.jpg",
-      "inscrit": false
+      "inscrit": true
     }
   ];
 
@@ -41,7 +41,10 @@ class _HomePageState extends State<HomePage> {
           parcours: objetTest[index]['parcours'],
           participants: objetTest[index]['participants'],
           organisateur: objetTest[index]['organisateur'],
+          coactivites: objetTest[index]['coactivites'],
+          recommandations: objetTest[index]['recommandations'],
           description: objetTest[index]['description'],
+          tags: objetTest[index]['tags'],
           image: objetTest[index]['image'],
           inscrit: objetTest[index]['inscrit']);
     }
