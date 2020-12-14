@@ -13,6 +13,7 @@ class TagBadge extends StatefulWidget {
 class _TagBadgeState extends State<TagBadge> {
   @override
   Widget build(BuildContext context) {
+    // ignore: missing_required_param
     return TextButton(
       child: Text("${widget.nom}",
           style: TextStyle(
