@@ -8,6 +8,9 @@ class CardActivity extends StatefulWidget {
   final DateTime date;
   final String lieu;
   final String type;
+  final String nom_officiel;
+  final String site_internet_activite;
+  final String activite;
   final int distance;
   final double vitesse;
   final String parcours;
@@ -20,11 +23,16 @@ class CardActivity extends StatefulWidget {
   final List<String> tags;
   final String image;
   final bool inscrit;
+  final bool distanciation;
+  final int placesRestantes;
 
   CardActivity(
       {@required this.date,
       @required this.lieu,
       @required this.type,
+      this.nom_officiel,
+      this.site_internet_activite,
+      @required this.activite,
       @required this.distance,
       @required this.vitesse,
       @required this.parcours,
@@ -34,9 +42,11 @@ class CardActivity extends StatefulWidget {
       @required this.coactivites,
       @required this.recommandations,
       @required this.description,
-      @required this.tags,
-      @required this.image,
+      this.tags,
+      this.image,
       @required this.inscrit,
+      @required this.distanciation,
+      @required this.placesRestantes,
       Key key})
       : super(key: key);
 
@@ -45,8 +55,18 @@ class CardActivity extends StatefulWidget {
 }
 
 class _CardActivityState extends State<CardActivity> {
-  List<Widget> buildTags() {
+  Map<String, dynamic> iconsByType = {
+    "marche": Icons.directions_walk,
+    "course": Icons.directions_run,
+    "velo": Icons.directions_bike
+  };
+
+  buildTags() {
     List<Widget> tagBadges = [];
+
+    if (widget.tags == null) {
+      return Text("");
+    }
 
     widget.tags.forEach((tag) {
       tagBadges = [...tagBadges, TagBadge(nom: tag)];
@@ -82,7 +102,7 @@ class _CardActivityState extends State<CardActivity> {
                 nn
               ])}"),
               trailing: Icon(
-                Icons.directions_walk,
+                iconsByType[widget.type.toLowerCase()],
                 color: colorBlack,
                 size: 35.0,
               )),
@@ -100,7 +120,7 @@ class _CardActivityState extends State<CardActivity> {
             text: TextSpan(children: [
               WidgetSpan(child: Icon(Icons.nature, color: colorRed)),
               TextSpan(
-                  text: "${widget.type} - ${widget.distance} km",
+                  text: "${widget.activite} - ${widget.distance} km",
                   style: TextStyle(color: colorBlack)),
               WidgetSpan(child: Icon(Icons.speed_outlined, color: colorRed)),
               TextSpan(
@@ -178,7 +198,7 @@ class _CardActivityState extends State<CardActivity> {
                   ],
                 )
               : Text(""),
-          Image.network(widget.image)
+          widget.image != null ? Image.network(widget.image) : Text("")
         ],
       ),
     );

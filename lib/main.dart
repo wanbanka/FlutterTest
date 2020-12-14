@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: "Form Test",
       home: new LoginForm(),
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: [const Locale("fr"), const Locale("en")],
+      supportedLocales: [const Locale("fr")],
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case '/login':
