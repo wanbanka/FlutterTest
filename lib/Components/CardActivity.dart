@@ -61,6 +61,11 @@ class _CardActivityState extends State<CardActivity> {
     "velo": Icons.directions_bike
   };
 
+  Map<String, dynamic> iconsByParcours = {
+    "chemin": Icons.directions,
+    "route": Icons.alt_route
+  };
+
   buildTags() {
     List<Widget> tagBadges = [];
 
@@ -126,7 +131,9 @@ class _CardActivityState extends State<CardActivity> {
               TextSpan(
                   text: "${widget.vitesse} km/h",
                   style: TextStyle(color: colorBlack)),
-              WidgetSpan(child: Icon(Icons.directions, color: colorRed)),
+              WidgetSpan(
+                  child: Icon(iconsByParcours[widget.parcours.toLowerCase()],
+                      color: colorRed)),
               TextSpan(
                   text: "Parcours ${widget.parcours}",
                   style: TextStyle(color: colorBlack)),

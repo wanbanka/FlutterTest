@@ -30,15 +30,48 @@ class _HomePageState extends State<HomePage> {
       "tags": ["Ultra-Trail", "Nature"],
       "image":
           "https://www.corunning.fr//avatar/5f612883e75c1d10ec38f9d6_activite.jpg",
+      "inscrit": false,
+      "distanciation": false,
+      "placesRestantes": 15
+    },
+    {
+      "date": new DateTime(2020, 12, 12, 9),
+      "lieu": "FRETERIVE - 73250",
+      "type": "Course",
+      "activite": "Course à pied",
+      "distance": 14,
+      "vitesse": 14.0,
+      "parcours": "Route",
+      "participants": 1,
+      "organisateur": "Lucien",
+      "coactivites": 0,
+      "recommandations": 0,
+      "description": "Prévoir 1 heure.",
+      "tags": ["Botanique", "Nature", "Yoga"],
+      "inscrit": true,
+      "distanciation": false,
+      "placesRestantes": 15
+    },
+    {
+      "date": new DateTime(2020, 11, 16, 13, 10),
+      "lieu": "Toulouse",
+      "type": "Marche",
+      "activite": "Marche à pied",
+      "distance": 10,
+      "vitesse": 10.0,
+      "parcours": "Route",
+      "groupe": "Toulouse st Cyprien",
+      "participants": 1,
+      "organisateur": "Emma",
+      "coactivites": 0,
+      "recommandations": 0,
+      "description": "Prévoir 1 heure.",
+      "tags": ["Balade", "Randonnée", "Echauffement"],
       "inscrit": true,
       "distanciation": false,
       "placesRestantes": 15
     }
   ];
-
-  List<int> listeEntiers = [];
-
-  int get count => listeEntiers.length;
 
   List<Widget> cards = [];
 
@@ -72,8 +105,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    listeEntiers.addAll(List.generate(25, (index) => index));
-
     listCards();
   }
 
@@ -93,10 +124,119 @@ class _HomePageState extends State<HomePage> {
             image: DecorationImage(
                 image: AssetImage('assets/background_home.png'),
                 fit: BoxFit.cover)),
-        child: ListView(children: [
-          Column(
-            children: [
-              Padding(
+        child: RefreshIndicator(
+          child: LoadMore(
+            isFinish: cardsLen >= 4,
+            onLoadMore: loadMore,
+            child: ListView.builder(
+              itemBuilder: (BuildContext context, int i) {
+                return cards[i];
+              },
+              itemCount: cardsLen,
+            ),
+            whenEmptyLoad: false,
+            delegate: DefaultLoadMoreDelegate(),
+            textBuilder: DefaultLoadMoreTextBuilder.english,
+          ),
+          onRefresh: refresh,
+        ),
+      ),
+      // ignore: missing_required_param
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add), backgroundColor: colorRed),
+    );
+  }
+
+  void load() {
+    print("load");
+
+    var newObjet = [
+      {
+        "date": new DateTime(2020, 11, 16, 13, 10),
+        "lieu": "Toulouse",
+        "type": "Marche",
+        "activite": "Marche à pied",
+        "distance": 10,
+        "vitesse": 10.0,
+        "parcours": "Route",
+        "groupe": "Toulouse st Cyprien",
+        "participants": 1,
+        "organisateur": "Emma",
+        "coactivites": 0,
+        "recommandations": 0,
+        "description": "Prévoir 1 heure.",
+        "tags": ["Balade", "Randonnée", "Echauffement"],
+        "inscrit": true,
+        "distanciation": false,
+        "placesRestantes": 15
+      },
+      {
+        "date": new DateTime(2020, 10, 31, 10),
+        "lieu": "Morlaix",
+        "type": "Marche",
+        "activite": "Marche à pied",
+        "distance": 10,
+        "vitesse": 4.0,
+        "parcours": "Chemin",
+        "groupe": "ASHM",
+        "participants": 1,
+        "organisateur": "Benjamin",
+        "coactivites": 3,
+        "recommandations": 0,
+        "description":
+            "Prévoir 2 heures 30 minutes. Octobre Rose organise pour la première fois à Morlaix une Marche Rose",
+        "tags": ["Balade"],
+        "inscrit": true,
+        "distanciation": false,
+        "placesRestantes": 15,
+        "image":
+            "https://www.corunning.fr/avatar/5f91a977d04392097db5c178_activite.jpg"
+      }
+    ];
+
+    setState(() {
+      for (int index = 0; index < newObjet.length; index++) {
+        cards.add(CardActivity(
+          date: newObjet[index]['date'],
+          lieu: newObjet[index]['lieu'],
+          type: newObjet[index]['type'],
+          activite: newObjet[index]['activite'],
+          distance: newObjet[index]['distance'],
+          vitesse: newObjet[index]['vitesse'],
+          parcours: newObjet[index]['parcours'],
+          participants: newObjet[index]['participants'],
+          organisateur: newObjet[index]['organisateur'],
+          coactivites: newObjet[index]['coactivites'],
+          recommandations: newObjet[index]['recommandations'],
+          description: newObjet[index]['description'],
+          tags: newObjet[index]['tags'],
+          image: newObjet[index]['image'],
+          inscrit: newObjet[index]['inscrit'],
+          distanciation: newObjet[index]['distanciation'],
+          placesRestantes: newObjet[index]['placesRestantes'],
+        ));
+      }
+      print("Data count : ${cards.length}");
+    });
+  }
+
+  Future<bool> loadMore() async {
+    print("On loadMore");
+    await Future.delayed(Duration(milliseconds: 2000));
+    load();
+    return true;
+  }
+
+  Future<void> refresh() async {
+    await Future.delayed(Duration(milliseconds: 2000));
+    cards.clear();
+    listCards();
+    load();
+  }
+
+  /* Put these buttons on the burger menu
+
+Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: RaisedButton.icon(
                   onPressed: () {
@@ -136,45 +276,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-            ],
-          ),
-          RefreshIndicator(
-            child: LoadMore(
-              isFinish: count >= 1,
-              onLoadMore: loadMore,
-              child: cards,
-              whenEmptyLoad: false,
-              delegate: DefaultLoadMoreDelegate(),
-              textBuilder: DefaultLoadMoreTextBuilder.english,
-            ),
-            onRefresh: refresh,
-          ),
-        ]),
-      ),
-      // ignore: missing_required_param
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), backgroundColor: colorRed),
-    );
-  }
 
-  void load() {
-    print("load");
-
-    setState(() {
-      print("Data count : ${cards.length}");
-    });
-  }
-
-  Future<bool> loadMore() async {
-    print("On loadMore");
-    await Future.delayed(Duration(milliseconds: 2000));
-    load();
-    return true;
-  }
-
-  Future<void> refresh() async {
-    await Future.delayed(Duration(milliseconds: 2000));
-    cards.clear();
-    load();
-  }
+  */
 }
