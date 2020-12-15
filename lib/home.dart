@@ -78,27 +78,29 @@ class _HomePageState extends State<HomePage> {
   int get cardsLen => cards.length;
 
   listCards() {
-    for (int index = 0; index < objetTest.length; index++) {
-      cards.add(CardActivity(
-        date: objetTest[index]['date'],
-        lieu: objetTest[index]['lieu'],
-        type: objetTest[index]['type'],
-        activite: objetTest[index]['activite'],
-        distance: objetTest[index]['distance'],
-        vitesse: objetTest[index]['vitesse'],
-        parcours: objetTest[index]['parcours'],
-        participants: objetTest[index]['participants'],
-        organisateur: objetTest[index]['organisateur'],
-        coactivites: objetTest[index]['coactivites'],
-        recommandations: objetTest[index]['recommandations'],
-        description: objetTest[index]['description'],
-        tags: objetTest[index]['tags'],
-        image: objetTest[index]['image'],
-        inscrit: objetTest[index]['inscrit'],
-        distanciation: objetTest[index]['distanciation'],
-        placesRestantes: objetTest[index]['placesRestantes'],
-      ));
-    }
+    setState(() {
+      for (int index = 0; index < objetTest.length; index++) {
+        cards.add(CardActivity(
+          date: objetTest[index]['date'],
+          lieu: objetTest[index]['lieu'],
+          type: objetTest[index]['type'],
+          activite: objetTest[index]['activite'],
+          distance: objetTest[index]['distance'],
+          vitesse: objetTest[index]['vitesse'],
+          parcours: objetTest[index]['parcours'],
+          participants: objetTest[index]['participants'],
+          organisateur: objetTest[index]['organisateur'],
+          coactivites: objetTest[index]['coactivites'],
+          recommandations: objetTest[index]['recommandations'],
+          description: objetTest[index]['description'],
+          tags: objetTest[index]['tags'],
+          image: objetTest[index]['image'],
+          inscrit: objetTest[index]['inscrit'],
+          distanciation: objetTest[index]['distanciation'],
+          placesRestantes: objetTest[index]['placesRestantes'],
+        ));
+      }
+    });
   }
 
   @override
@@ -230,7 +232,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> refresh() async {
     await Future.delayed(Duration(milliseconds: 2000));
     cards.clear();
-    load();
+    listCards();
   }
 
   /* Put these buttons on the burger menu
