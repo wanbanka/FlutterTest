@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
       "description": "Prévoir 15 heures.",
       "tags": ["Ultra-Trail", "Nature"],
       "image":
-          "https://www.corunning.fr//avatar/5f612883e75c1d10ec38f9d6_activite.jpg",
+          "https://www.corunning.fr/avatar/5f612883e75c1d10ec38f9d6_activite.jpg",
       "inscrit": false,
       "distanciation": false,
       "placesRestantes": 15
@@ -173,8 +173,8 @@ class _HomePageState extends State<HomePage> {
       {
         "date": new DateTime(2020, 10, 31, 10),
         "lieu": "Morlaix",
-        "type": "Marche",
-        "activite": "Marche à pied",
+        "type": "Velo",
+        "activite": "Vélo",
         "distance": 10,
         "vitesse": 4.0,
         "parcours": "Chemin",
@@ -230,7 +230,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> refresh() async {
     await Future.delayed(Duration(milliseconds: 2000));
     cards.clear();
-    listCards();
     load();
   }
 
