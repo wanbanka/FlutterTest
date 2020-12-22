@@ -1,8 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/animation.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert' show base64, json, ascii;
 
 class LoginForm extends StatefulWidget {
   LoginForm({Key key}) : super(key: key);
@@ -11,179 +11,95 @@ class LoginForm extends StatefulWidget {
   _LoginFormState createState() => _LoginFormState();
 }
 
-class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
-  final formKey = GlobalKey<FormState>();
+class _LoginFormState extends State<LoginForm> {
+  final SERVER_IP = "http://192.168.1.167:5000";
+  final storage = FlutterSecureStorage();
 
-  final myController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  final controller2 = TextEditingController();
+  final key = GlobalKey<FormState>();
 
-  AnimationController buttonController;
+  final usernameValidator = MultiValidator([
+    RequiredValidator(errorText: "Champ requis"),
+    MinLengthValidator(8, errorText: "Plus de 8 caractères")
+  ]);
 
-  var buttonZoomOut;
+  void displayDialog(BuildContext context, String title, String text) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          AlertDialog(
+            title: Text(title),
+            content: Text(text),
+          );
+        });
+  }
 
-  double paddingTop;
+  Future<String> attemptLogIn(String username, String password) async {
+    var res = await http.post("$SERVER_IP/login",
+        body: {"username": username, "password": password});
 
-  double paddingLeft;
+    if (res.statusCode == 200) {
+      return res.body;
+    }
+
+    return null;
+  }
+
+  Future<int> attemptSignUp(String username, String password) async {
+    var res = await http.post("$SERVER_IP/signup",
+        body: {"username": username, "password": password});
+
+    return res.statusCode;
+  }
 
   @override
   void initState() {
-    buttonController = new AnimationController(
-        duration: Duration(milliseconds: 1000), vsync: this)
-      ..addListener(() {
-        setState(() {});
-
-        if (buttonController.isCompleted) {
-          Navigator.pushReplacementNamed(context, "/home");
-        }
-      });
-
-    buttonZoomOut = new Tween(begin: 70.0, end: 1000.0).animate(
-        new CurvedAnimation(parent: buttonController, curve: Curves.bounceOut))
-      ..addStatusListener((status) {
-        print(status);
-      });
-
     super.initState();
   }
 
   @override
   void dispose() {
-    myController.dispose();
-    controller2.dispose();
-    buttonController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    BuildContext globalContext = context;
-
-    final usernameValidator = MultiValidator([
-      RequiredValidator(errorText: "Champ requis"),
-      PatternValidator("^.{8,}", errorText: "Plus de 8 caractères")
-    ]);
-
     return Scaffold(
-      body: Builder(
-        builder: (context) => Center(
-          child: Container(
-            alignment: Alignment.center,
+        appBar: AppBar(
+          title: Text("Log in"),
+        ),
+        body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/background_login.jpg'),
+                    image: AssetImage("assets/background_login.jpg"),
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(
                         Color(0x88aaaaaa), BlendMode.exclusion))),
             child: Form(
-              key: formKey,
+              key: key,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: myController,
-                      decoration: InputDecoration(
-                          labelStyle: TextStyle(color: Color(0xffffffff)),
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: new BorderSide(color: Colors.white)),
-                          labelText: "Identifiant",
-                          icon: Icon(
-                            Icons.person,
-                            color: Color(0xffffffff),
-                          )),
-                      validator: usernameValidator,
-                      style: TextStyle(color: Color(0xffffffff)),
-                    ),
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    validator: usernameValidator,
+                    decoration: InputDecoration(labelText: "Username"),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      validator: RequiredValidator(errorText: "Champ requis"),
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      obscureText: true,
-                      controller: controller2,
-                      decoration: InputDecoration(
-                          labelStyle: TextStyle(color: Color(0xffffffff)),
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: new BorderSide(color: Colors.white)),
-                          labelText: "Mot de passe",
-                          icon: Icon(
-                            Icons.lock,
-                            color: Color(0xffffffff),
-                          )),
-                      style: TextStyle(color: Color(0xffffffff)),
-                    ),
+                  TextFormField(
+                    controller: _passwordController,
+                    validator: RequiredValidator(errorText: "Chanp requis"),
+                    decoration: InputDecoration(labelText: "Password"),
+                    obscureText: false,
+                    enableSuggestions: false,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 32.0, 8.0, 8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        if (formKey.currentState.validate()) {
-                          buttonController.forward();
-                        }
-                      },
-                      child: Transform.scale(
-                        scale: 1 + buttonController.value,
-                        // ignore: missing_required_param
-                        child: TextButton(
-                            child: buttonZoomOut.value < 100.0
-                                ? Text('Se connecter')
-                                : buttonZoomOut.value < 500.0
-                                    ? new CircularProgressIndicator(
-                                        value: null,
-                                        strokeWidth: 1.0,
-                                        valueColor:
-                                            new AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
-                                      )
-                                    : null,
-                            style: ButtonStyle(
-                                animationDuration: Duration(milliseconds: 3000),
-                                backgroundColor: MaterialStateProperty.all<Color>(
-                                    const Color(0xff98c045)),
-                                padding: buttonZoomOut.value < 100.0
-                                    ? MaterialStateProperty.all<EdgeInsets>(
-                                        EdgeInsets.only(
-                                            left: 48,
-                                            right: 48,
-                                            top: 16,
-                                            bottom: 16))
-                                    : MaterialStateProperty.all<EdgeInsets>(
-                                        EdgeInsets.all(buttonZoomOut.value)),
-                                foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        const Color(0xffffffff)),
-                                shape: MaterialStateProperty.all<OutlinedBorder>(
-                                    RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30.0))),
-                                textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(fontSize: 20.0)))),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: TextButton(
-                      onPressed: () {
-                        print('OK Mot de passe !');
-                      },
-                      child: Text("J'ai oublié mon mot de passe"),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0x00000000)),
-                        foregroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xffffffff)),
-                      ),
-                    ),
-                  )
+                  FlatButton(child: Text("Log In"), onPressed: () {}),
+                  FlatButton(child: Text("Sign Up"), onPressed: () {})
                 ],
+                mainAxisAlignment: MainAxisAlignment.center,
               ),
-            ),
-          ),
-        ),
-      ),
-    );
+            )));
   }
 }
