@@ -2,112 +2,64 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import './Components/Utilities/Colors.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert' show base64, json, ascii;
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+  final String jwt;
+  final Map<String, dynamic> payload;
+
+  HomePage({Key key, this.jwt, this.payload}) : super(key: key);
+
+  //Create another HomePage's object, after processing payload
+
+  factory HomePage.fromBase64(String jwt) => HomePage(
+        jwt: jwt,
+        payload: json.decode(
+            ascii.decode(base64.decode(base64.normalize(jwt.split(".")[1])))),
+      );
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final String url = 'http://www.omdbapi.com/?i=tt3896198&apikey=91cf00f8';
-  Map<String, dynamic> film;
-  bool dataOk = false;
+  //IP Adress of Node Server
+  final SERVER_IP = "http://192.168.1.12:3000";
 
   @override
   void initState() {
     super.initState();
-    recupFilm();
-  }
-
-  Future<void> recupFilm() async {
-    var response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      film = convert.jsonDecode(response.body);
-
-      setState(() {
-        dataOk = !dataOk;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "CoRunning",
-          style: TextStyle(color: Colors.black),
+        appBar: AppBar(
+          title: Text("HomePage"),
         ),
-        backgroundColor: Colors.white,
-      ),
-      body: dataOk ? affichage() : attente(),
-      backgroundColor: Colors.blueGrey[900],
-      // ignore: missing_required_param
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add), backgroundColor: colorRed),
-    );
-  }
-
-  Widget attente() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            "En attente de données",
-            style: TextStyle(
-                color: colorWhite, fontSize: 20.0, fontWeight: FontWeight.bold),
+        body: Center(
+          //Build a Widget according to the future value
+          child: FutureBuilder(
+            future: http.read("$SERVER_IP/data",
+                headers: {"Authorization": widget.jwt}),
+            builder: (context, snapshot) {
+              //Check if there's a data on the snapshot of the future
+              return snapshot.hasData
+                  ? Column(
+                      children: <Widget>[
+                        Text(
+                            "${widget.payload['username']}, here's the data : "),
+                        Text(
+                          snapshot.data,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        )
+                      ],
+                    )
+                  : snapshot.hasError
+                      ? Text("An error occurred")
+                      : CircularProgressIndicator();
+            },
           ),
-          CircularProgressIndicator()
-        ],
-      ),
-    );
-  }
-
-  Widget affichage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          film != null
-              ? Text(
-                  "${film['Title']}",
-                  style: TextStyle(
-                      color: colorWhite,
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold),
-                )
-              : Text("Aucune donnée"),
-          film != null
-              ? Text("${film['Year']}", style: TextStyle(color: colorWhite))
-              : Text("Aucune donnée"),
-          Padding(padding: const EdgeInsets.all(20.0)),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.6,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                  color: colorBlack,
-                  offset: Offset(0.0, 7.0),
-                  spreadRadius: 3.0,
-                  blurRadius: 15.0)
-            ]),
-            child: film != null
-                ? Image.network("${film['Poster']}")
-                : Text("Aucune donnée"),
-          ),
-          Padding(padding: const EdgeInsets.all(20.0)),
-          film != null
-              ? Text(
-                  "${film['Plot']}",
-                  style: TextStyle(color: colorWhite),
-                  textAlign: TextAlign.center,
-                )
-              : Text("Aucune donnée")
-        ],
-      ),
-    );
+        ));
   }
 }
