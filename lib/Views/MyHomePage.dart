@@ -35,7 +35,12 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             Text(
               //Appel de la variable counter du controlleur
               '${con.counter}',
-            )
+            ),
+            Divider(
+              color: Colors.black,
+            ),
+            Text(
+                "Login de l'appli: ${con.displayLogin()}, autre login: ${con.displayLogin2()}"),
           ],
         ),
       ),
