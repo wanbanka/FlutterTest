@@ -3,7 +3,9 @@ import 'package:mvc_application/view.dart' show App, Colors, StateMVC;
 import '../Controllers/Controller.dart';
 import 'Badge.dart';
 
-import 'package:eventify/eventify.dart' as Event show Listener;
+import 'package:eventify/eventify.dart';
+
+import '../Models/EventHandler.dart';
 
 //Page d'accueil
 
@@ -24,6 +26,11 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
+  increment() {
+//Appel de la fonction incrementCounter du controlleur
+    setState(con.incrementCounter);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,14 +49,21 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             Divider(
               color: Colors.black,
             ),
-            BadgeClick(objetManip: this),
+            BadgeClick(
+              onPressed: () {
+                EventHandler eventHandler = EventHandler(increment);
+
+                eventHandler.initSystem();
+
+                eventHandler.listener.callback(Event("add"), this);
+              },
+            ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //Appel de la fonction incrementCounter du controlleur
-          setState(con.incrementCounter);
+          increment();
         },
         tooltip: 'Increment',
         child: Icon(Icons.add),
