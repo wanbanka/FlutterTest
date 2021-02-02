@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mvc_application/view.dart' show App, Colors, StateMVC;
 import '../Controllers/Controller.dart';
+import 'Badge.dart';
+
+import 'package:eventify/eventify.dart' as Event show Listener;
 
 //Page d'accueil
 
@@ -39,8 +42,7 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             Divider(
               color: Colors.black,
             ),
-            Text(
-                "Login de l'appli: ${con.displayLogin()}, autre login: ${con.displayLogin2()}"),
+            BadgeClick(objetManip: this),
           ],
         ),
       ),
