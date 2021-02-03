@@ -30,5 +30,7 @@ class EventHandler {
 
     this.listener = emitter.on("add", this, cb);
     //Emits the result of the event, with sending information or not
+
+    this.listener.callback(Event("add"), this);
   }
 }

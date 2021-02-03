@@ -54,8 +54,6 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
                 EventHandler eventHandler = EventHandler(increment);
 
                 eventHandler.initSystem();
-
-                eventHandler.listener.callback(Event("add"), this);
               },
             ),
           ],
