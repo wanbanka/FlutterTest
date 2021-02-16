@@ -1,15 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mvc_application/view.dart' show StateMVC;
 import '../Controllers/Controller.dart';
-import 'Badge.dart';
-
-import 'package:flutter/cupertino.dart' show CupertinoSwitch;
-
-import '../Models/EventHandler.dart';
-
-//Liste constante de choix de modes de transport
-
-enum RadioChoix { Voiture, Avion, Bateau }
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 //Page d'accueil
 
@@ -30,29 +24,22 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
-  //Valeur initiale du switch
+  //Widget affichant l'image, ou l'erreur de chargement, ou aucune image
 
-  bool _choixSwitch = false;
-
-  //Bouton radio Avion cochée
-
-  RadioChoix _choixRadio = RadioChoix.Avion;
-
-  //Icône de l'avion affichée dès l'initialisation
-
-  Icon _iconRadio = Icon(Icons.airplanemode_active);
-
-  //Map pour les checkobx
-
-  Map _mapTransport = {
-    RadioChoix.Avion: false,
-    RadioChoix.Bateau: false,
-    RadioChoix.Voiture: false
-  };
-
-  increment() {
-//Appel de la fonction incrementCounter du controlleur
-    setState(con.incrementCounter);
+  Widget _visualiserImage() {
+    if (con.userLogged.image != null) {
+      return Image.file(con.userLogged.image);
+    } else if (con.errorPicture != "") {
+      return Text(
+        "Erreur de récupération d'image: ${con.errorPicture}",
+        textAlign: TextAlign.center,
+      );
+    } else {
+      return Text(
+        "Aucune image",
+        textAlign: TextAlign.center,
+      );
+    }
   }
 
   @override
@@ -63,209 +50,96 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(widget.title),
             Text(
-              //Appel de la variable counter du controlleur
-              '${con.counter}',
+              "${con.userLogged.prenom} ${con.userLogged.nom}",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[300],
+                  fontSize: 40.0),
             ),
-            Divider(
-              color: Colors.black,
-            ),
-            BadgeClick(
-              onPressed: () {
-                EventHandler eventHandler = EventHandler(increment);
-
-                eventHandler.initSystem();
-              },
-            ),
-            Text(
-              "Choix de l'utilisateur",
-              style: TextStyle(color: Colors.blueGrey, fontSize: 38),
-            ),
-            Divider(),
-            Text(
-              "Switch",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CupertinoSwitch(
-                  value: _choixSwitch, //Valeur du switch
-                  activeColor: Colors.green, //Couleur du switch s'il est activé
-                  onChanged: (value) {
-                    //Affecte le booléen à une variable
-                    setState(() {
-                      _choixSwitch = value;
-                    });
-                  },
-                ),
-                Text(_choixSwitch ? "Pour" : "Contre")
-              ],
-            ),
-            Divider(),
-            Text(
-              "Radio",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                  value: RadioChoix.Voiture, //Valeur du bouton radio
-                  groupValue:
-                      _choixRadio, //Bouton radio rattaché à une variable, comme les autres
-                  activeColor:
-                      Colors.green, //Couleur du bouton radio s'il est activé
-                  onChanged: (value) {
-                    //Affecte le booléen à une variable
-                    setState(() {
-                      _choixRadio = value;
-                      _iconRadio = Icon(Icons.directions_car);
-                    });
-                  },
-                ),
-                Text(
-                  "Voiture",
-                  style: _choixRadio ==
-                          RadioChoix
-                              .Voiture //Change la couleur du texte si le bouton radio est activé
-                      ? TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.bold)
-                      : TextStyle(),
-                ),
-                Radio(
-                  value: RadioChoix.Avion,
-                  groupValue: _choixRadio,
-                  activeColor: Colors.green,
-                  onChanged: (value) {
-                    setState(() {
-                      _choixRadio = value;
-                      _iconRadio = Icon(Icons.airplanemode_active);
-                    });
-                  },
-                ),
-                Text(
-                  "Avion",
-                  style: _choixRadio == RadioChoix.Avion
-                      ? TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.bold)
-                      : TextStyle(),
-                ),
-                Radio(
-                  value: RadioChoix.Bateau,
-                  groupValue: _choixRadio,
-                  activeColor: Colors.green,
-                  onChanged: (value) {
-                    setState(() {
-                      _choixRadio = value;
-                      _iconRadio = Icon(Icons.directions_boat);
-                    });
-                  },
-                ),
-                Text(
-                  "Bateau",
-                  style: _choixRadio == RadioChoix.Bateau
-                      ? TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.bold)
-                      : TextStyle(),
-                )
-              ],
-            ),
-            _iconRadio,
-            Divider(),
-            Text(
-              "Checkbox",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Checkbox(
-                  activeColor:
-                      Colors.green, //Couleur du checkbox s'il est activé
-                  value: _mapTransport[RadioChoix.Voiture], //Valeur du checkbox
-                  onChanged: (value) {
-                    //Affecte le booléen à une variable
-                    setState(() {
-                      _mapTransport[RadioChoix.Voiture] = value;
-                    });
-                  },
-                ),
-                Text(
-                  "Voiture",
-                  style: _mapTransport[RadioChoix
-                          .Voiture] //Change la couleur du texte si le checkbox est activé
-                      ? TextStyle(color: Colors.green)
-                      : TextStyle(),
-                ),
-                Checkbox(
-                  activeColor: Colors.green,
-                  value: _mapTransport[RadioChoix.Avion],
-                  onChanged: (value) {
-                    setState(() {
-                      _mapTransport[RadioChoix.Avion] = value;
-                    });
-                  },
-                ),
-                Text(
-                  "Avion",
-                  style: _mapTransport[RadioChoix.Avion]
-                      ? TextStyle(color: Colors.green)
-                      : TextStyle(),
-                ),
-                Checkbox(
-                  activeColor: Colors.green,
-                  value: _mapTransport[RadioChoix.Bateau],
-                  onChanged: (value) {
-                    setState(() {
-                      _mapTransport[RadioChoix.Bateau] = value;
-                    });
-                  },
-                ),
-                Text(
-                  "Bateau",
-                  style: _mapTransport[RadioChoix.Bateau]
-                      ? TextStyle(color: Colors.green)
-                      : TextStyle(),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.directions_car,
-                  color: _mapTransport[RadioChoix
-                          .Voiture] //Change la couleur de l'icône si la checkbox correspondante est activée
-                      ? Colors.green
-                      : Colors.grey[300],
-                ),
-                Icon(
-                  Icons.airplanemode_active,
-                  color: _mapTransport[RadioChoix.Avion]
-                      ? Colors.green
-                      : Colors.grey[300],
-                ),
-                Icon(
-                  Icons.directions_boat,
-                  color: _mapTransport[RadioChoix.Bateau]
-                      ? Colors.green
-                      : Colors.grey[300],
-                )
-              ],
-            )
+            _visualiserImage()
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          increment();
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FloatingActionButton(
+              onPressed: () async {
+                //Récupère une image de la galerie
+                await con.retrievePicture(ImageSource.gallery).then((nothing) {
+                  setState(() {
+                    _visualiserImage();
+                  });
+                });
+              },
+              backgroundColor: Colors.green,
+              child: const Icon(Icons.photo_library),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: FloatingActionButton(
+              onPressed: () async {
+                //Récupère une image prise par la caméra
+
+                await con.retrievePicture(ImageSource.camera).then((nothing) {
+                  setState(() {
+                    _visualiserImage();
+                  });
+                });
+              },
+              backgroundColor: Colors.green[800],
+              child: const Icon(Icons.photo_camera),
+            ),
+          ),
+          con.userLogged.image != null
+              ? Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      //Appel de la fonction de cropping
+
+                      File croppedFile = await ImageCropper.cropImage(
+                          //Chemin de l'image à traiter
+                          sourcePath: con.userLogged.image.path,
+                          //Presets de cropping
+                          aspectRatioPresets: [
+                            CropAspectRatioPreset.square,
+                            CropAspectRatioPreset.ratio3x2,
+                            CropAspectRatioPreset.original,
+                            CropAspectRatioPreset.ratio4x3,
+                            CropAspectRatioPreset.ratio16x9
+                          ],
+                          //Modifications de la page de cropping sous Android
+                          androidUiSettings: AndroidUiSettings(
+                              toolbarTitle: 'Cropper',
+                              toolbarColor: Colors.deepOrange,
+                              toolbarWidgetColor: Colors.white,
+                              initAspectRatio: CropAspectRatioPreset.original,
+                              lockAspectRatio: false),
+                          //Modifications de la page de cropping sous IOS
+                          iosUiSettings:
+                              IOSUiSettings(minimumAspectRatio: 1.0));
+
+                      //Modification de l'image de l'utilisateur
+
+                      setState(() {
+                        con.userLogged.image = File(croppedFile.path);
+                        _visualiserImage();
+                      });
+                    },
+                    backgroundColor: Colors.green[800],
+                    child: const Icon(Icons.photo_size_select_large),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(0.0),
+                )
+        ],
       ),
     );
   }

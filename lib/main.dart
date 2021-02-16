@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'Views/MyHomePage.dart';
 
-import 'package:mvc_application/view.dart'
-    show AppStatefulWidget, AppMVC, AppState, App, Colors, ThemeData;
+import 'package:mvc_application/view.dart' show AppMVC;
 
 void main() {
   runApp(MyApp());
