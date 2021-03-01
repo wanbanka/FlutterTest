@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mvc_application/view.dart' show StateMVC;
 import '../Controllers/Controller.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 
 //Page d'accueil
 
@@ -24,123 +21,74 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
-  //Widget affichant l'image, ou l'erreur de chargement, ou aucune image
+  //Index de l'étape du stepper
 
-  Widget _visualiserImage() {
-    if (con.userLogged.image != null) {
-      return Image.file(con.userLogged.image);
-    } else if (con.errorPicture != "") {
-      return Text(
-        "Erreur de récupération d'image: ${con.errorPicture}",
-        textAlign: TextAlign.center,
-      );
-    } else {
-      return Text(
-        "Aucune image",
-        textAlign: TextAlign.center,
-      );
-    }
+  int _index = 0;
+
+  //Permet d'incrémenter l'index (pour passer à l'étape suivante)
+
+  void _incrementStepper() {
+    setState(() {
+      if (_index < 3) {
+        _index++;
+      }
+    });
+  }
+
+//Permet de décrémenter l'index (pour passer à l'étape précédente)
+
+  void _decrementStepper() {
+    setState(() {
+      if (_index > 0) {
+        _index--;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+//Liste des différentes étapes à suivre
+
+    List<Step> steps = [
+      Step(
+          title: Text("Palier 1"), //Titre de l'étape
+          isActive: _index ==
+              0, //Etape active ou non (coloration d'une icône en bleu)
+          state: _index > 0
+              ? StepState.complete
+              : StepState
+                  .indexed, //Icône à afficher si l'étape est remplie ou non par l'utilisateur
+          content: Text("Ceci est le contenu du Stepper 1")),
+      Step(
+          title: Text("Palier 2"),
+          isActive: _index == 1,
+          state: _index > 1 ? StepState.complete : StepState.indexed,
+          content: Text("Ceci est le contenu du Stepper 2")),
+      Step(
+          title: Text("Palier 3"),
+          isActive: _index == 2,
+          state: _index > 2 ? StepState.complete : StepState.indexed,
+          content: Text("Ceci est le contenu du Stepper 3")),
+      Step(
+          title: Text("Palier 4"),
+          isActive: _index == 3,
+          state: _index > 3 ? StepState.complete : StepState.indexed,
+          content: Text("Ceci est le contenu du Stepper 4"))
+    ];
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              "${con.userLogged.prenom} ${con.userLogged.nom}",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[300],
-                  fontSize: 40.0),
-            ),
-            _visualiserImage()
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: FloatingActionButton(
-              onPressed: () async {
-                //Récupère une image de la galerie
-                await con.retrievePicture(ImageSource.gallery).then((nothing) {
-                  setState(() {
-                    _visualiserImage();
-                  });
-                });
-              },
-              backgroundColor: Colors.green,
-              child: const Icon(Icons.photo_library),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: FloatingActionButton(
-              onPressed: () async {
-                //Récupère une image prise par la caméra
-
-                await con.retrievePicture(ImageSource.camera).then((nothing) {
-                  setState(() {
-                    _visualiserImage();
-                  });
-                });
-              },
-              backgroundColor: Colors.green[800],
-              child: const Icon(Icons.photo_camera),
-            ),
-          ),
-          con.userLogged.image != null
-              ? Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: FloatingActionButton(
-                    onPressed: () async {
-                      //Appel de la fonction de cropping
-
-                      File croppedFile = await ImageCropper.cropImage(
-                          //Chemin de l'image à traiter
-                          sourcePath: con.userLogged.image.path,
-                          //Presets de cropping
-                          aspectRatioPresets: [
-                            CropAspectRatioPreset.square,
-                            CropAspectRatioPreset.ratio3x2,
-                            CropAspectRatioPreset.original,
-                            CropAspectRatioPreset.ratio4x3,
-                            CropAspectRatioPreset.ratio16x9
-                          ],
-                          //Modifications de la page de cropping sous Android
-                          androidUiSettings: AndroidUiSettings(
-                              toolbarTitle: 'Cropper',
-                              toolbarColor: Colors.deepOrange,
-                              toolbarWidgetColor: Colors.white,
-                              initAspectRatio: CropAspectRatioPreset.original,
-                              lockAspectRatio: false),
-                          //Modifications de la page de cropping sous IOS
-                          iosUiSettings:
-                              IOSUiSettings(minimumAspectRatio: 1.0));
-
-                      //Modification de l'image de l'utilisateur
-
-                      setState(() {
-                        con.userLogged.image = File(croppedFile.path);
-                        _visualiserImage();
-                      });
-                    },
-                    backgroundColor: Colors.green[800],
-                    child: const Icon(Icons.photo_size_select_large),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(0.0),
-                )
-        ],
-      ),
-    );
+        body: Stepper(
+          physics: ScrollPhysics(),
+          steps: steps, //Etapes du Stepper
+          currentStep: _index, //Etape actuelle à afficher
+          onStepContinue:
+              _incrementStepper, //Appelle la fonction pour afficher l'étape suivante
+          onStepCancel:
+              _decrementStepper, //Appelle la fonction pour afficher l'étape précédente
+          type: StepperType.horizontal, //Stepper vertical ou horizontal
+        ));
   }
 }
