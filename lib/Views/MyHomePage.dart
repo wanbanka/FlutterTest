@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mvc_application/view.dart' show App, Colors, StateMVC;
+import 'package:liquid_engine/liquid_engine.dart';
 import '../Controllers/Controller.dart';
 
 //Page d'accueil
@@ -39,8 +40,6 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             Divider(
               color: Colors.black,
             ),
-            Text(
-                "Login de l'appli: ${con.displayLogin()}, autre login: ${con.displayLogin2()}"),
           ],
         ),
       ),
