@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_tutorial/flutter_sliding_tutorial.dart';
 import 'package:mvc_application/view.dart' show App, Colors, StateMVC;
 import '../Controllers/Controller.dart';
 
@@ -21,36 +22,61 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
+  PageController pageController = PageController();
+
+  ValueNotifier<double> notifier = ValueNotifier(0.0);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(widget.title),
-            Text(
-              //Appel de la variable counter du controlleur
-              '${con.counter}',
-            ),
-            Divider(
-              color: Colors.black,
-            ),
-            Text(
-                "Login de l'appli: ${con.displayLogin()}, autre login: ${con.displayLogin2()}"),
-          ],
+      body: AnimatedBackgroundColor(
+        colors: Colors.accents,
+        pageController: pageController,
+        pageCount: 4,
+        child: PageView(
+          controller: pageController,
+          onPageChanged: (page) {
+            setState(() {
+              notifier.value = page.toDouble();
+            });
+          },
+          children: List<Widget>.generate(4, (index) {
+            return SlidingPage(
+                child: Stack(
+                  children: [
+                    SlidingContainer(
+                      child: Center(child: Text("Title: $index")),
+                      offset: 200,
+                    ),
+                    SlidingContainer(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 50),
+                        child: Center(
+                          child: Text("Description: $index"),
+                        ),
+                      ),
+                      offset: 350,
+                    ),
+                  ],
+                ),
+                page: index,
+                notifier: notifier);
+          }),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          //Appel de la fonction incrementCounter du controlleur
-          setState(con.incrementCounter);
-        },
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      appBar: AppBar(
+        title: SlidingIndicator(
+          notifier: notifier,
+          activeIndicator: Container(
+            color: Colors.green,
+          ),
+          inActiveIndicator: Container(
+            color: Colors.yellow,
+          ),
+          indicatorCount: 4,
+          margin: 8,
+          sizeIndicator: 20,
+        ),
       ),
     );
   }
