@@ -1,6 +1,6 @@
+import 'package:appMVC/Services/CalendarService.dart';
 import 'package:flutter/material.dart';
 import 'package:mvc_application/view.dart' show App, Colors, StateMVC;
-import 'package:liquid_engine/liquid_engine.dart';
 import '../Controllers/Controller.dart';
 
 //Page d'accueil
@@ -22,6 +22,8 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
+  CalendarService calendarService = CalendarService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +42,14 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
             Divider(
               color: Colors.black,
             ),
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: IconButton(
+                  onPressed: () async {
+                    await calendarService.addEvent();
+                  },
+                  icon: Icon(Icons.calendar_today)),
+            )
           ],
         ),
       ),
