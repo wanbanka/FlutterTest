@@ -22,28 +22,50 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
 
   Controller con;
 
+  //Controlleur de la pagination
+
   PageController pageController = PageController();
+
+  //Notifier renvoyant une valeur aux différents listeners
+  // (numéro de page)
 
   ValueNotifier<double> notifier = ValueNotifier(0.0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //Widget gérant la transition fadeIn entre plusieurs slides
+      //avec fond coloré
+
       body: AnimatedBackgroundColor(
+        //Liste des couleurs
+
         colors: Colors.accents,
         pageController: pageController,
+
+        //Nombre de pages du slider
         pageCount: 4,
+
+        //Création d'une liste de pages réalisant un slider
+
         child: PageView(
           controller: pageController,
+
+          //Fonction réagissant au changement de page
+
           onPageChanged: (page) {
             setState(() {
               notifier.value = page.toDouble();
             });
           },
           children: List<Widget>.generate(4, (index) {
+            //Widget définissant une page de slide
+
             return SlidingPage(
                 child: Stack(
                   children: [
+                    //Container d'une SlidingPage
+
                     SlidingContainer(
                       child: Center(child: Text("Title: $index")),
                       offset: 200,
@@ -59,22 +81,43 @@ class _MyHomePageState extends StateMVC<MyHomePage> {
                     ),
                   ],
                 ),
+
+                //Numéro de page
+
                 page: index,
+
+                //Indique le numéro de page à la PageView
                 notifier: notifier);
           }),
         ),
       ),
       appBar: AppBar(
+        //Widget indiquant où en est l'utilisateur dans le slider
+
         title: SlidingIndicator(
+          //Indique le numéro de page
+
           notifier: notifier,
+
+          //Page actuelle
+
           activeIndicator: Container(
             color: Colors.green,
           ),
+
+          //Autres pages
+
           inActiveIndicator: Container(
             color: Colors.yellow,
           ),
+
+          //Nombre d'indicateurs
+
           indicatorCount: 4,
           margin: 8,
+
+          //Taille d'un indicateur
+
           sizeIndicator: 20,
         ),
       ),
